@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Changed Title -->
+    <title>Gate Judging</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for a native app feel */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        }
+        /* Style for the radio buttons to look like a segmented control */
+        .radio-label {
+            @apply block w-full cursor-pointer rounded-lg border border-gray-600 bg-gray-700 py-3 px-4 text-center text-sm font-medium text-gray-300 transition-all duration-200 ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-inter">
+
+    <div class="max-w-md mx-auto min-h-screen bg-gray-800 shadow-lg p-6">
+        <!-- Changed Title -->
+        <h1 class="text-3xl font-bold text-center text-white mb-6">Gate Judging</h1>
+
+        <!--
+          This form's 'action' is your Google Form Submission URL.
+          We will intercept the 'submit' event with JavaScript.
+        -->
+        <form id="statForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8BGyWb91SaPUdOfizgt0bZvLgCLwBp2P4gPCOHiruyRaOUw/formResponse" method="POST">
+
+            <div class="space-y-6">
+
+                <!-- NEW: Station Selector -->
+                <div>
+                    <label for="station-selector" class="block text-sm font-medium text-gray-300 mb-2">Station</label>
+                    <select id="station-selector" required class="block w-full rounded-lg border-gray-600 bg-gray-700 p-3 text-white placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="" disabled selected>Select a station</option>
+                        <option value="Start">Start</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="Finish">Finish</option>
+                    </select>
+                </div>
+
+                <!-- Bib Number (Text Input) -->
+                <div>
+                    <label for="bib-number" class="block text-sm font-medium text-gray-300 mb-2">Bib Number</label>
+                    <input
+                        type="text"
+                        id="bib-number"
+                        name="entry.1708578938"
+                        required
+                        class="block w-full rounded-lg border-gray-600 bg-gray-700 p-3 text-white placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="e.g., 123"
+                        inputmode="numeric">
+                </div>
+
+                <!-- 19 Radio Button Questions -->
+                <!-- Added id="gates-container" and "hidden" class -->
+                <div id="gates-container" class="space-y-4 hidden">
+
+                    <!--
+                      UPDATED STRUCTURE:
+                      "Clean" is now the first option.
+                      "Play" changed to "Gate".
+                    -->
+
+                    <!-- Gate 1 -->
+                    <!-- Added id="gate-row-1" -->
+                    <div id="gate-row-1" class="grid grid-cols-2 items-center gap-2">
+                        <!-- Changed label from Play to Gate -->
+                        <label class="font-medium text-gray-200">Gate 1:</label>
+                        <div class="flex space-x-2" role="group">
+                            <!-- Option 1: Clean (Default) - Moved to first position -->
+                            <div class="flex-1">
+                                <input type="radio" id="play-1-clean" name="entry.55002585" value="Clean" class="hidden peer" required checked>
+                                <label for="play-1-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <!-- Option 2: Touch -->
+                            <div class="flex-1">
+                                <input type="radio" id="play-1-touch" name="entry.55002585" value="Touch" class="hidden peer">
+                                <label for="play-1-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <!-- Option 3: Fifty -->
+                            <div class="flex-1">
+                                <input type="radio" id="play-1-fifty" name="entry.55002585" value="Fifty" class="hidden peer">
+                                <label for="play-1-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 2 -->
+                    <div id="gate-row-2" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 2:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-2-clean" name="entry.1855197499" value="Clean" class="hidden peer" required checked>
+                                <label for="play-2-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-2-touch" name="entry.1855197499" value="Touch" class="hidden peer">
+                                <label for="play-2-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-2-fifty" name="entry.1855197499" value="Fifty" class="hidden peer">
+                                <label for="play-2-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 3 -->
+                    <div id="gate-row-3" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 3:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-3-clean" name="entry.838150175" value="Clean" class="hidden peer" required checked>
+                                <label for="play-3-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-3-touch" name="entry.838150175" value="Touch" class="hidden peer">
+                                <label for="play-3-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-3-fifty" name="entry.838150175" value="Fifty" class="hidden peer">
+                                <label for="play-3-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 4 -->
+                    <div id="gate-row-4" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 4:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-4-clean" name="entry.2134907932" value="Clean" class="hidden peer" required checked>
+                                <label for="play-4-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-4-touch" name="entry.2134907932" value="Touch" class="hidden peer">
+                                <label for="play-4-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-4-fifty" name="entry.2134907932" value="Fifty" class="hidden peer">
+                                <label for="play-4-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 5 -->
+                    <div id="gate-row-5" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 5:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-5-clean" name="entry.76231793" value="Clean" class="hidden peer" required checked>
+                                <label for="play-5-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-5-touch" name="entry.76231793" value="Touch" class="hidden peer">
+                                <label for="play-5-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-5-fifty" name="entry.76231793" value="Fifty" class="hidden peer">
+                                <label for="play-5-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 6 -->
+                    <div id="gate-row-6" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 6:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-6-clean" name="entry.2014836299" value="Clean" class="hidden peer" required checked>
+                                <label for="play-6-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-6-touch" name="entry.2014836299" value="Touch" class="hidden peer">
+                                <label for="play-6-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-6-fifty" name="entry.2014836299" value="Fifty" class="hidden peer">
+                                <label for="play-6-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 7 -->
+                    <div id="gate-row-7" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 7:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-7-clean" name="entry.1263576022" value="Clean" class="hidden peer" required checked>
+                                <label for="play-7-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-7-touch" name="entry.1263576022" value="Touch" class="hidden peer">
+                                <label for="play-7-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-7-fifty" name="entry.1263576022" value="Fifty" class="hidden peer">
+                                <label for="play-7-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 8 -->
+                    <div id="gate-row-8" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 8:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-8-clean" name="entry.714148965" value="Clean" class="hidden peer" required checked>
+                                <label for="play-8-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-8-touch" name="entry.714148965" value="Touch" class="hidden peer">
+                                <label for="play-8-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-8-fifty" name="entry.714148965" value="Fifty" class="hidden peer">
+                                <label for="play-8-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 9 -->
+                    <div id="gate-row-9" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 9:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-9-clean" name="entry.2091158156" value="Clean" class="hidden peer" required checked>
+                                <label for="play-9-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-9-touch" name="entry.2091158156" value="Touch" class="hidden peer">
+                                <label for="play-9-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-9-fifty" name="entry.2091158156" value="Fifty" class="hidden peer">
+                                <label for="play-9-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 10 -->
+                    <div id="gate-row-10" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 10:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-10-clean" name="entry.954036935" value="Clean" class="hidden peer" required checked>
+                                <label for="play-10-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-10-touch" name="entry.954036935" value="Touch" class="hidden peer">
+                                <label for="play-10-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-10-fifty" name="entry.954036935" value="Fifty" class="hidden peer">
+                                <label for="play-10-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 11 -->
+                    <div id="gate-row-11" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 11:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-11-clean" name="entry.1849885105" value="Clean" class="hidden peer" required checked>
+                                <label for="play-11-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-11-touch" name="entry.1849885105" value="Touch" class="hidden peer">
+                                <label for="play-11-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-11-fifty" name="entry.1849885105" value="Fifty" class="hidden peer">
+                                <label for="play-11-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 12 -->
+                    <div id="gate-row-12" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 12:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-12-clean" name="entry.1598024978" value="Clean" class="hidden peer" required checked>
+                                <label for="play-12-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-12-touch" name="entry.1598024978" value="Touch" class="hidden peer">
+                                <label for="play-12-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-12-fifty" name="entry.1598024978" value="Fifty" class="hidden peer">
+                                <label for="play-1List" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 13 -->
+                    <div id="gate-row-13" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 13:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-13-clean" name="entry.1849166482" value="Clean" class="hidden peer" required checked>
+                                <label for="play-13-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-13-touch" name="entry.1849166482" value="Touch" class="hidden peer">
+                                <label for="play-13-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-13-fifty" name="entry.1849166482" value="Fifty" class="hidden peer">
+                                <label for="play-13-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 14 -->
+                    <div id="gate-row-14" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 14:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-14-clean" name="entry.1790035018" value="Clean" class="hidden peer" required checked>
+                                <label for="play-14-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-14-touch" name="entry.1790035018" value="Touch" class="hidden peer">
+                                <label for="play-14-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-14-fifty" name="entry.1790035018" value="Fifty" class="hidden peer">
+                                <label for="play-14-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 15 -->
+                    <div id="gate-row-15" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 15:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-15-clean" name="entry.51888731" value="Clean" class="hidden peer" required checked>
+                                <label for="play-15-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-15-touch" name="entry.51888731" value="Touch" class="hidden peer">
+                                <label for="play-15-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-15-fifty" name="entry.51888731" value="Fifty" class="hidden peer">
+                                <label for="play-15-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 16 -->
+                    <div id="gate-row-16" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 16:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-16-clean" name="entry.1479632689" value="Clean" class="hidden peer" required checked>
+                                <label for="play-16-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-16-touch" name="entry.1479632689" value="Touch" class="hidden peer">
+                                <label for="play-16-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-16-fifty" name="entry.1479632689" value="Fifty" class="hidden peer">
+                                <label for="play-16-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 17 -->
+                    <div id="gate-row-17" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 17:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-17-clean" name="entry.331391847" value="Clean" class="hidden peer" required checked>
+                                <label for="play-17-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-17-touch" name="entry.331391847" value="Touch" class="hidden peer">
+                                <label for="play-17-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-17-fifty" name="entry.331391847" value="Fifty" class="hidden peer">
+                                <label for="play-17-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 18 -->
+                    <div id="gate-row-18" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 18:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-18-clean" name="entry.1598320935" value="Clean" class="hidden peer" required checked>
+                                <label for="play-18-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-18-touch" name="entry.1598320935" value="Touch" class="hidden peer">
+                                <label for="play-18-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-18-fifty" name="entry.1598320935" value="Fifty" class="hidden peer">
+                                <label for="play-18-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gate 19 -->
+                    <div id="gate-row-19" class="grid grid-cols-2 items-center gap-2">
+                        <label class="font-medium text-gray-200">Gate 19:</label>
+                        <div class="flex space-x-2" role="group">
+                            <div class="flex-1">
+                                <input type="radio" id="play-19-clean" name="entry.1176839769" value="Clean" class="hidden peer" required checked>
+                                <label for="play-19-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Clean
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-19-touch" name="entry.1176839769" value="Touch" class="hidden peer">
+                                <label for="play-19-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Touch
+                                </label>
+                            </div>
+                            <div class="flex-1">
+                                <input type="radio" id="play-19-fifty" name="entry.1176839769" value="Fifty" class="hidden peer">
+                                <label for="play-19-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
+                                    Fifty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- End of radio button container -->
+
+                <!-- Time (Text Input) -->
+                <!-- Added id="time-field-container" and "hidden" class -->
+                <div id="time-field-container" class="hidden">
+                    <!-- Corrected Label -->
+                    <label for="time" class="block text-sm font-medium text-gray-300 mb-2">Time (MM:SS.HH)</label>
+
+                    <input
+                        type="text"
+                        id="time"
+                        name="entry.873039571"
+                        required
+                        class="block w-full rounded-lg border-gray-600 bg-gray-700 p-3 text-white placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="e.g., 01:45.23"
+                        pattern="\d{1,2}:\d{2}\.\d{2}"
+                        title="Please enter time in MM:SS.HH format"
+                        inputmode="numeric">
+                </div>
+
+                <!-- Status Message -->
+                <div id="statusMessage" class="hidden text-center text-sm font-medium p-3 rounded-lg"></div>
+
+                <!-- Button Container -->
+                <div class="space-y-4">
+                    <!-- Submit Button -->
+                    <button
+                        type="submit"
+                        id="submitButton"
+                        class="flex w-full justify-center rounded-lg bg-blue-600 py-3 px-4 text-lg font-semibold text-white shadow-sm transition-all duration-200 ease-in-out hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50">
+                        Submit
+                    </button>
+
+                    <!-- NEW: Reset Button -->
+                    <button
+                        type="button"
+                        id="resetButton"
+                        class="flex w-full justify-center rounded-lg bg-gray-600 py-2 px-4 text-sm font-medium text-gray-200 shadow-sm transition-all duration-200 ease-in-out hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                        Reset All Fields
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded before running scripts
+        window.addEventListener('DOMContentLoaded', (event) => {
+
+            // Get all form elements
+            const form = document.getElementById('statForm');
+            const submitButton = document.getElementById('submitButton');
+            const statusMessage = document.getElementById('statusMessage');
+            const timeInput = document.getElementById('time');
+
+            // Get new station-related elements
+            const stationSelector = document.getElementById('station-selector');
+            const gatesContainer = document.getElementById('gates-container');
+            const timeFieldContainer = document.getElementById('time-field-container');
+            const resetButton = document.getElementById('resetButton'); // Get new reset button
+
+            // Define the mapping of stations to visible gates
+            const stationGateMap = {
+                "Start": [1, 2],
+                "A": [3, 4, 5, 6, 7],
+                "B": [8, 9, 10, 11, 12, 13],
+                "C": [14, 15, 16, 17, 18, 19],
+                "Finish": []
+            };
+
+            /**
+             * Updates the visibility and disabled state of form fields
+             * based on the currently selected station.
+             */
+            function updateFormVisibility() {
+                const selectedStation = stationSelector.value;
+                const visibleGateNumbers = stationGateMap[selectedStation] || [];
+
+                // 1. Show/Hide Gates Container
+                if (visibleGateNumbers.length > 0) {
+                    gatesContainer.classList.remove('hidden');
+                } else {
+                    gatesContainer.classList.add('hidden');
+                }
+
+                // 2. Show/Hide and Enable/Disable Individual Gates
+                for (let i = 1; i <= 19; i++) {
+                    const row = document.getElementById(`gate-row-${i}`);
+                    if (!row) continue; // Safety check
+
+                    const inputs = row.querySelectorAll('input[type="radio"]');
+                    const isVisible = visibleGateNumbers.includes(i);
+
+                    if (isVisible) {
+                        row.classList.remove('hidden');
+                        // Enable inputs so they are submitted
+                        inputs.forEach(input => input.disabled = false);
+                    } else {
+                        row.classList.add('hidden');
+                        // Disable inputs so they are NOT submitted
+                        inputs.forEach(input => input.disabled = true);
+                    }
+                }
+
+                // 3. Show/Hide and Enable/Disable Time Field
+                if (selectedStation === 'Finish') {
+                    timeFieldContainer.classList.remove('hidden');
+                    // Enable time input so it is submitted
+                    timeInput.disabled = false;
+                } else {
+                    timeFieldContainer.classList.add('hidden');
+                    // Disable time input so it is NOT submitted
+                    timeInput.disabled = true;
+                }
+            }
+
+            // Add event listener to the station selector
+            stationSelector.addEventListener('change', updateFormVisibility);
+
+            // Call the function once on load to set the initial state (all hidden)
+            updateFormVisibility();
+
+
+            // Add an input event listener to the time field for formatting
+            timeInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+
+                if (value.length > 6) {
+                    value = value.substring(0, 6); // Limit to 6 digits (MMSSHH)
+                }
+
+                if (value.length > 4) {
+                    // Format as M:SS.HH or MM:SS.HH
+                    e.target.value = value.substring(0, value.length - 4) + ':' + value.substring(value.length - 4, value.length - 2) + '.' + value.substring(value.length - 2);
+                } else if (value.length > 2) {
+                    // Format as M:SS or MM:SS
+                    e.target.value = value.substring(0, value.length - 2) + ':' + value.substring(value.length - 2);
+                } else {
+                    e.target.value = value;
+                }
+            });
+
+            // Add submit listener to the form
+            form.addEventListener('submit', async function(event) {
+                // Stop the form from submitting the traditional way
+                event.preventDefault();
+
+                // Check form validity (HTML5 'required' and 'pattern' checks)
+                if (!form.checkValidity()) {
+                    // If invalid, trigger the browser's built-in validation UI
+                    form.reportValidity();
+                    return;
+                }
+
+                // Disable button and show loading message
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+                statusMessage.textContent = 'Submitting data...';
+                statusMessage.className = 'block text-center text-sm font-medium p-3 rounded-lg bg-yellow-600 text-white';
+                statusMessage.classList.remove('hidden');
+
+                // Get the form data
+                const formData = new FormData(form);
+                const url = form.action;
+
+                // --- NEW: Save the selected station ---
+                const selectedStation = stationSelector.value;
+
+                try {
+                    // Send the data to the Google Form URL
+                    await fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        mode: 'no-cors'
+                    });
+
+                    // --- If the fetch promise resolves, we assume success ---
+
+                    // Show success message
+                    statusMessage.textContent = 'Success! Stats submitted.';
+                    statusMessage.className = 'block text-center text-sm font-medium p-3 rounded-lg bg-green-600 text-white';
+
+                    // Reset the form for the next entry
+                    form.reset();
+
+                    // --- NEW: Restore the station selector ---
+                    stationSelector.value = selectedStation;
+
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+
+                    // Re-hide all fields after reset
+                    updateFormVisibility();
+
+                    // Re-enable the button after a short delay
+                    setTimeout(() => {
+                        submitButton.disabled = false;
+                        // Changed button text
+                        submitButton.textContent = 'Submit';
+                        statusMessage.classList.add('hidden');
+                    }, 2000);
+
+                } catch (error) {
+                    // --- If the fetch itself fails (e.g., no internet) ---
+                    console.error('Error submitting form:', error);
+
+                    // Show error message
+                    statusMessage.textContent = 'Error: Submission failed. Check connection.';
+                    statusMessage.className = 'block text-center text-sm font-medium p-3 rounded-lg bg-red-600 text-white';
+
+                    // Re-enable the button
+                    submitButton.disabled = false;
+                    // Changed button text
+                    submitButton.textContent = 'Submit';
+                }
+            });
+
+            // --- NEW: Add event listener for the Reset button ---
+            resetButton.addEventListener('click', function() {
+                // Perform a full form reset
+                form.reset();
+
+                // Manually re-hide all conditional fields
+                updateFormVisibility();
+
+                // Clear any status messages
+                statusMessage.classList.add('hidden');
+
+                // Scroll to top
+                window.scrollTo(0, 0);
+            });
+
+        }); // End of DOMContentLoaded
+    </script>
+
+</body>
+</html>
