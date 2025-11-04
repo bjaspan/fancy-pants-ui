@@ -1,0 +1,11 @@
+{
+  "race_name": "Farmington",
+  "stations": [
+    { "name": "Start", "max_gate": 2 },
+    { "name": "Station A", "max_gate": 6 },
+    { "name": "Station B", "max_gate": 9 },
+    { "name": "Station C", "max_gate": 14 },
+    { "name": "Station D", "max_gate": 19 },
+    { "name": "Finish", "is_finish": true }
+  ],
+}
