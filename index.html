@@ -828,6 +828,8 @@
                 // Show/Hide Bib Number Field
                 if (selectedStation) {
                     bibNumberContainer.classList.remove('hidden');
+                    // Focus the bib number field as soon as it appears
+                    document.getElementById('bib-number').focus();
                 } else {
                     bibNumberContainer.classList.add('hidden');
                 }
