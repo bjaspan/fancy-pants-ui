@@ -7,5 +7,5 @@
     { "name": "Station C", "max_gate": 14 },
     { "name": "Station D", "max_gate": 19 },
     { "name": "Finish", "is_finish": true }
-  ],
+  ]
 }
