@@ -936,6 +936,21 @@
             form.addEventListener('submit', async function(event) {
                 event.preventDefault();
 
+                // --- NEW BIB NUMBER VALIDATION ---
+                const bibNumberInput = document.getElementById('bib-number');
+                const bibNumberValue = bibNumberInput.value.trim();
+
+                // Check if it's a non-empty string of digits (integer)
+                if (!/^\d+$/.test(bibNumberValue)) {
+                    statusMessage.textContent = 'Error: Bib Number must be a whole number (e.g., 123).';
+                    statusMessage.className = 'block text-center text-sm font-medium p-3 rounded-lg bg-red-600 text-white';
+                    statusMessage.classList.remove('hidden');
+                    bibNumberInput.focus();
+                    bibNumberInput.select();
+                    return; // Stop the submission
+                }
+                // --- END NEW VALIDATION ---
+
                 if (!form.checkValidity()) {
                     form.reportValidity();
                     return;
