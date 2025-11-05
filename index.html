@@ -777,6 +777,20 @@
                     return metadata;
 
                 } catch (error) {
+                    // Check if this is the "Failed to parse URL" error specific to the canvas
+                    if (error.message.includes("Failed to parse URL")) {
+                        console.warn("Canvas environment detected. Using hardcoded fallback metadata.");
+                        // Return the hardcoded fallback metadata
+                        return {
+                            "race_name": "Test Race (Canvas)",
+                            "stations": [
+                                { "name": "Start", "max_gate": 1 },
+                                { "name": "Finish", "is_finish": true }
+                            ]
+                        };
+                    }
+
+                    // For other errors, use the retry logic
                     console.error("Error fetching or parsing metadata:", error);
                     loadingError.textContent = `Error: ${error.message}. Retrying in 5s...`;
                     return null;
@@ -874,9 +888,10 @@
                 formContent.classList.add('hidden');
 
                 let metadata = null;
-                while (!metadata) {
+                while (!metadata) { // Loop until we get metadata (either real or fallback)
                     metadata = await fetchAndParseMetadata();
                     if (!metadata) {
+                        // This means a retriable error occurred
                         // Wait 5 seconds before retrying
                         await new Promise(resolve => setTimeout(resolve, 5000));
                     }
@@ -889,12 +904,18 @@
 
                 // Reset form state and update visibility
                 form.reset();
+                // Ensure station selector is enabled on load/reset
+                stationSelector.disabled = false;
                 updateFormVisibility();
             }
 
             // --- Event Listeners ---
 
-            stationSelector.addEventListener('change', updateFormVisibility);
+            stationSelector.addEventListener('change', function() {
+                updateFormVisibility();
+                // Disable the selector once a station is chosen
+                stationSelector.disabled = true;
+            });
 
             timeInput.addEventListener('input', function(e) {
                 let value = e.target.value.replace(/[^0-9]/g, '');
@@ -945,6 +966,12 @@
                     stationSelector.value = selectedStation;
                     window.scrollTo(0, 0);
                     updateFormVisibility();
+
+                    // Re-disable the station selector after submission
+                    stationSelector.disabled = true;
+
+                    // This line is no longer needed as updateFormVisibility() now handles it.
+                    // document.getElementById('bib-number').focus();
 
                     setTimeout(() => {
                         submitButton.disabled = false;
