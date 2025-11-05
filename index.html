@@ -16,32 +16,37 @@
         .radio-label {
             @apply block w-full cursor-pointer rounded-lg border border-gray-600 bg-gray-700 py-3 px-4 text-center text-sm font-medium text-gray-300 transition-all duration-200 ease-in-out;
         }
+        /* Hide elements by default */
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 font-inter">
 
     <div class="max-w-md mx-auto min-h-screen bg-gray-800 shadow-lg p-6">
-        <h1 class="text-3xl font-bold text-center text-white mb-6">Gate Judging</h1>
+        <h1 id="race-title" class="text-3xl font-bold text-center text-white mb-6">Gate Judging</h1>
 
         <form id="statForm" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8BGyWb91SaPUdOfizgt0bZvLgCLwBp2P4gPCOHiruyRaOUw/formResponse" method="POST">
 
-            <div class="space-y-6">
+            <!-- Loading/Error State -->
+            <div id="loading-state" class="text-center p-4">
+                <p class="text-lg text-gray-300">Loading Race Data...</p>
+                <p id="loading-error" class="text-red-400 mt-2"></p>
+            </div>
 
-                <!-- Station Selector (Label Removed) -->
+            <!-- Main Form Content (hidden by default) -->
+            <div id="form-content" class="hidden space-y-6">
+
+                <!-- Station Selector (will be populated dynamically) -->
                 <div>
-                    <!-- <label for="station-selector" class="block text-sm font-medium text-gray-300 mb-2">Station</label> -->
                     <select id="station-selector" required class="block w-full rounded-lg border-gray-600 bg-gray-700 p-3 text-white placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="" disabled selected>Select a station</option>
-                        <option value="Start">Start</option>
-                        <!-- Updated Display Values -->
-                        <option value="A">Station A</option>
-                        <option value="B">Station B</option>
-                        <option value="C">Station C</option>
-                        <option value="Finish">Finish</option>
+                        <!-- Stations will be added here by JS -->
                     </select>
                 </div>
 
-                <!-- Bib Number (Text Input) - Now hidden by default -->
+                <!-- Bib Number (Text Input) -->
                 <div id="bib-number-container" class="hidden">
                     <label for="bib-number" class="block text-sm font-medium text-gray-300 mb-2">Bib Number</label>
                     <input
@@ -54,28 +59,25 @@
                         inputmode="numeric">
                 </div>
 
-                <!-- 19 Radio Button Questions -->
+                <!-- 19 Radio Button Questions (Static in HTML, dynamic logic) -->
                 <div id="gates-container" class="space-y-4 hidden">
 
                     <!-- Gate 1 -->
-                    <div id="gate-row-1" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-1" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 1:</label>
                         <div class="flex space-x-2" role="group">
-                            <!-- Option 1: Clean (Default) -->
                             <div class="flex-1">
                                 <input type="radio" id="play-1-clean" name="entry.55002585" value="Clean" class="hidden peer" required checked>
                                 <label for="play-1-clean" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
                                     Clean
                                 </label>
                             </div>
-                            <!-- Option 2: Touch -->
                             <div class="flex-1">
                                 <input type="radio" id="play-1-touch" name="entry.55002585" value="Touch" class="hidden peer">
                                 <label for="play-1-touch" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
                                     Touch
                                 </label>
                             </div>
-                            <!-- Option 3: Fifty -->
                             <div class="flex-1">
                                 <input type="radio" id="play-1-fifty" name="entry.55002585" value="Fifty" class="hidden peer">
                                 <label for="play-1-fifty" class="radio-label hover:bg-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-500">
@@ -86,7 +88,7 @@
                     </div>
 
                     <!-- Gate 2 -->
-                    <div id="gate-row-2" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-2" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 2:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -111,7 +113,7 @@
                     </div>
 
                     <!-- Gate 3 -->
-                    <div id="gate-row-3" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-3" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 3:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -136,7 +138,7 @@
                     </div>
 
                     <!-- Gate 4 -->
-                    <div id="gate-row-4" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-4" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 4:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -161,7 +163,7 @@
                     </div>
 
                     <!-- Gate 5 -->
-                    <div id="gate-row-5" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-5" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 5:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -186,7 +188,7 @@
                     </div>
 
                     <!-- Gate 6 -->
-                    <div id="gate-row-6" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-6" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 6:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -211,7 +213,7 @@
                     </div>
 
                     <!-- Gate 7 -->
-                    <div id="gate-row-7" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-7" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 7:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -236,7 +238,7 @@
                     </div>
 
                     <!-- Gate 8 -->
-                    <div id="gate-row-8" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-8" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 8:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -261,7 +263,7 @@
                     </div>
 
                     <!-- Gate 9 -->
-                    <div id="gate-row-9" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-9" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 9:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -286,7 +288,7 @@
                     </div>
 
                     <!-- Gate 10 -->
-                    <div id="gate-row-10" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-10" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 10:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -311,7 +313,7 @@
                     </div>
 
                     <!-- Gate 11 -->
-                    <div id="gate-row-11" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-11" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 11:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -336,7 +338,7 @@
                     </div>
 
                     <!-- Gate 12 -->
-                    <div id="gate-row-12" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-12" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 12:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -361,7 +363,7 @@
                     </div>
 
                     <!-- Gate 13 -->
-                    <div id="gate-row-13" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-13" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 13:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -386,7 +388,7 @@
                     </div>
 
                     <!-- Gate 14 -->
-                    <div id="gate-row-14" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-14" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 14:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -411,7 +413,7 @@
                     </div>
 
                     <!-- Gate 15 -->
-                    <div id="gate-row-15" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-15" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 15:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -436,7 +438,7 @@
                     </div>
 
                     <!-- Gate 16 -->
-                    <div id="gate-row-16" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-16" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 16:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -461,7 +463,7 @@
                     </div>
 
                     <!-- Gate 17 -->
-                    <div id="gate-row-17" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-17" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 17:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -486,7 +488,7 @@
                     </div>
 
                     <!-- Gate 18 -->
-                    <div id="gate-row-18" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-18" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 18:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -511,7 +513,7 @@
                     </div>
 
                     <!-- Gate 19 -->
-                    <div id="gate-row-19" class="grid grid-cols-2 items-center gap-2">
+                    <div id="gate-row-19" class="hidden grid grid-cols-2 items-center gap-2">
                         <label class="font-medium text-gray-200">Gate 19:</label>
                         <div class="flex space-x-2" role="group">
                             <div class="flex-1">
@@ -570,7 +572,6 @@
                         type="button"
                         id="resetButton"
                         class="flex w-full justify-center rounded-lg bg-gray-600 py-2 px-4 text-sm font-medium text-gray-200 shadow-sm transition-all duration-200 ease-in-out hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800">
-                        <!-- Updated Text -->
                         Change Station
                     </button>
                 </div>
@@ -587,24 +588,94 @@
             const timeInput = document.getElementById('time');
 
             const stationSelector = document.getElementById('station-selector');
-            const bibNumberContainer = document.getElementById('bib-number-container'); // Get Bib container
+            const bibNumberContainer = document.getElementById('bib-number-container');
             const gatesContainer = document.getElementById('gates-container');
             const timeFieldContainer = document.getElementById('time-field-container');
             const resetButton = document.getElementById('resetButton');
 
-            const stationGateMap = {
-                "Start": [1, 2],
-                "A": [3, 4, 5, 6, 7],
-                "B": [8, 9, 10, 11, 12, 13],
-                "C": [14, 15, 16, 17, 18, 19],
-                "Finish": []
-            };
+            const raceTitleElement = document.getElementById('race-title');
+            const loadingState = document.getElementById('loading-state');
+            const loadingError = document.getElementById('loading-error');
+            const formContent = document.getElementById('form-content');
+
+            // Store the dynamically generated map
+            let stationGateMap = {};
+            let isFinishStation = {};
+
+            // const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSe8BGyWb91SaPUdOfizgt0bZvLgCLwBp2P4gPCOHiruyRaOUw/viewform'; // No longer needed
+
+            async function fetchAndParseMetadata() {
+                try {
+                    // Fetch the raw JSON file from the same origin
+                    // Add a cache-busting timestamp to ensure we get the latest file
+                    // FIX: Prepend './' to make the URL relative to the current path, resolving blob: context issues
+                    const response = await fetch(`./current_race.json?timestamp=${new Date().getTime()}`);
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to load race data (HTTP ${response.status})`);
+                    }
+
+                    const metadata = await response.json();
+
+                    // DEBUG: Log the fetched metadata
+                    console.log("Fetched metadata:", metadata);
+
+                    if (!metadata.race_name || !metadata.stations) {
+                        throw new Error("Metadata is missing 'race_name' or 'stations'.");
+                    }
+
+                    return metadata;
+
+                } catch (error) {
+                    console.error("Error fetching or parsing metadata:", error);
+                    loadingError.textContent = `Error: ${error.message}. Retrying in 5s...`;
+                    return null;
+                }
+            }
+
+            function buildStationUI(metadata) {
+                // Set Race Title
+                raceTitleElement.textContent = metadata.race_name || "Gate Judging";
+
+                // Clear existing options (except "Select a station")
+                while (stationSelector.options.length > 1) {
+                    stationSelector.remove(1);
+                }
+
+                // Reset internal maps
+                stationGateMap = {};
+                isFinishStation = {};
+
+                let startGate = 1;
+
+                // Populate station selector and gate map
+                metadata.stations.forEach(station => {
+                    const option = document.createElement('option');
+                    option.value = station.name;
+                    option.textContent = station.name;
+                    stationSelector.appendChild(option);
+
+                    isFinishStation[station.name] = !!station.is_finish;
+
+                    if (station.is_finish) {
+                        stationGateMap[station.name] = [];
+                    } else if (station.max_gate) {
+                        const endGate = station.max_gate;
+                        stationGateMap[station.name] = [];
+                        for (let i = startGate; i <= endGate; i++) {
+                            stationGateMap[station.name].push(i);
+                        }
+                        startGate = endGate + 1;
+                    }
+                });
+            }
+
 
             function updateFormVisibility() {
                 const selectedStation = stationSelector.value;
                 const visibleGateNumbers = stationGateMap[selectedStation] || [];
 
-                // --- NEW: Show/Hide Bib Number Field ---
+                // Show/Hide Bib Number Field
                 if (selectedStation) {
                     bibNumberContainer.classList.remove('hidden');
                 } else {
@@ -636,7 +707,7 @@
                 }
 
                 // 3. Show/Hide and Enable/Disable Time Field
-                if (selectedStation === 'Finish') {
+                if (isFinishStation[selectedStation]) {
                     timeFieldContainer.classList.remove('hidden');
                     timeInput.disabled = false;
                 } else {
@@ -645,8 +716,33 @@
                 }
             }
 
+            async function initializeApp() {
+                loadingState.classList.remove('hidden');
+                loadingError.textContent = '';
+                formContent.classList.add('hidden');
+
+                let metadata = null;
+                while (!metadata) {
+                    metadata = await fetchAndParseMetadata();
+                    if (!metadata) {
+                        // Wait 5 seconds before retrying
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                    }
+                }
+
+                buildStationUI(metadata);
+
+                loadingState.classList.add('hidden');
+                formContent.classList.remove('hidden');
+
+                // Reset form state and update visibility
+                form.reset();
+                updateFormVisibility();
+            }
+
+            // --- Event Listeners ---
+
             stationSelector.addEventListener('change', updateFormVisibility);
-            updateFormVisibility();
 
             timeInput.addEventListener('input', function(e) {
                 let value = e.target.value.replace(/[^0-9]/g, '');
@@ -714,12 +810,14 @@
             });
 
             resetButton.addEventListener('click', function() {
-                form.reset();
-                updateFormVisibility();
+                // Re-initialize the app, which re-fetches metadata and resets the form
+                initializeApp();
                 statusMessage.classList.add('hidden');
                 window.scrollTo(0, 0);
             });
 
+            // Initial load
+            initializeApp();
         });
     </script>
 
