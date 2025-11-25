@@ -551,7 +551,7 @@
                             <div class="relative">
                                 <input type="radio" id="gate-25-touch" name="entry.1989426203" value="Touch" class="sr-only peer">
                                 <label for="gate-25-touch" class="radio-label bg-gray-200 dark:bg-gray-600 peer-checked:bg-yellow-500 peer-checked:text-black dark:peer-checked:bg-yellow-400 hover:bg-gray-300 dark:hover:bg-gray-500">Touch</label>
-S                            </div>
+                            </div>
                             <div class="relative">
                                 <input type="radio" id="gate-25-fifty" name="entry.1989426203" value="Fifty" class="sr-only peer">
                                 <label for="gate-25-fifty" class="radio-label bg-gray-200 dark:bg-gray-600 peer-checked:bg-red-600 peer-checked:text-white dark:peer-checked:bg-red-500 hover:bg-gray-300 dark:hover:bg-gray-500">Fifty</label>
@@ -836,25 +836,35 @@ S                            </div>
                 });
             }
 
-            // Auto-format the time input
+            // Auto-format the time input (Right-to-Left fill)
             timeInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/[^0-9]/g, '');
-                let formattedValue = '';
+                // Remove non-numeric characters
+                let inputDigits = e.target.value.replace(/\D/g, '');
 
-                if (value.length > 0) {
-                    // MM
-                    formattedValue = value.substring(0, 2);
-                }
-                if (value.length > 2) {
-                    // MM:SS
-                    formattedValue += ':' + value.substring(2, 4);
-                }
-                if (value.length > 4) {
-                    // MM:SS.HH
-                    formattedValue += '.' + value.substring(4, 6);
+                // Limit to 6 digits (MMSSHH)
+                if (inputDigits.length > 6) {
+                    inputDigits = inputDigits.substring(0, 6);
                 }
 
-                e.target.value = formattedValue;
+                // If empty, clear field
+                if (inputDigits.length === 0) {
+                    e.target.value = '';
+                    return;
+                }
+
+                // Pad with leading zeros to ensure we always have enough for MM:SS.HH
+                // We need 6 digits to extract MM, SS, HH safely
+                const paddedDigits = inputDigits.padStart(6, '0');
+
+                // Slice parts
+                const mm = paddedDigits.substring(0, 2);
+                const ss = paddedDigits.substring(2, 4);
+                const hh = paddedDigits.substring(4, 6);
+
+                // Format: M:SS.HH or MM:SS.HH
+                // parseInt(mm, 10) removes the leading zero from minutes if present (e.g. "02" -> "2")
+                // This results in "2:30.55" instead of "02:30.55"
+                e.target.value = `${parseInt(mm, 10)}:${ss}.${hh}`;
             });
 
             // Handle form submission
