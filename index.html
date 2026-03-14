@@ -69,6 +69,9 @@
                         <option value="" disabled selected>Select a station</option>
                         <!-- Options will be dynamically populated -->
                     </select>
+
+                    <!-- Hidden field to submit the Station name to Google Forms -->
+                    <input type="hidden" id="station-hidden-input" name="entry.75359853" value="">
                 </div>
 
                 <!-- Bib Number (Hidden by default) -->
@@ -736,6 +739,9 @@
                 const gatesToShow = stationGateMap[selectedStation] || [];
                 const isFinish = isFinishStation[selectedStation] || false;
 
+                // Sync the selected station to the hidden input for form submission
+                document.getElementById('station-hidden-input').value = selectedStation || "";
+
                 // If no station is selected, hide everything
                 if (!selectedStation) {
                     bibSection.classList.add('hidden');
@@ -952,6 +958,17 @@
 
                 const formData = new FormData(form);
                 const selectedStation = stationSelector.value; // Save station
+
+                // Convert time (MM:SS.HH) to total decimal seconds for the Google Form
+                if (isFinishStation[selectedStation] && timeInput.value) {
+                    const [minutesStr, rest] = timeInput.value.split(':');
+                    if (minutesStr && rest) {
+                        const minutes = parseInt(minutesStr, 10);
+                        const seconds = parseFloat(rest);
+                        const totalSeconds = ((minutes * 60) + seconds).toFixed(2);
+                        formData.set('entry.873039571', totalSeconds);
+                    }
+                }
 
                 try {
                     const response = await fetch(SUBMISSION_URL, {
