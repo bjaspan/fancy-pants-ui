@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bib Number Lookup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .data-card {
+            transition: transform 0.2s;
+        }
+        .data-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-900">
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-blue-800 mb-2">Race Results Lookup</h1>
+            <p class="text-gray-600">Enter your bib number to see your stats.</p>
+        </header>
+
+        <!-- Search Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-grow">
+                    <label for="bibInput" class="block text-sm font-medium text-gray-700 mb-1">Bib Number</label>
+                    <input
+                        type="text"
+                        id="bibInput"
+                        placeholder="e.g. 101"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    >
+                </div>
+                <div class="flex items-end">
+                    <button
+                        onclick="fetchData()"
+                        id="searchBtn"
+                        class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg active:transform active:scale-95"
+                    >
+                        Search Results
+                    </button>
+                </div>
+            </div>
+            <div id="statusMessage" class="mt-4 text-sm hidden"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="loading" class="hidden flex flex-col items-center justify-center py-12">
+            <div class="loading-spinner mb-4"></div>
+            <p class="text-gray-500 animate-pulse">Fetching results from Published CSV...</p>
+        </div>
+
+        <div id="resultsContainer" class="space-y-6">
+            <!-- Cards will be injected here -->
+        </div>
+
+        <!-- No Results / Initial State -->
+        <div id="emptyState" class="text-center py-20 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No results to show</h3>
+            <p class="mt-1 text-sm text-gray-500">Enter a bib number above to begin.</p>
+        </div>
+    </div>
+
+    <!-- Footer / Debug Info -->
+    <footer class="text-center text-xs text-gray-400 pb-8 mt-auto px-4">
+        <p id="sourceInfo" class="truncate">Source: ...</p>
+    </footer>
+
+    <script>
+        // Default Configuration (Published CSV)
+        const DEFAULT_PUB_ID = '2PACX-1vS9t6men_kO_DcrE3ZxilkM9JNSpQfw9TrixtJqjRkARdEaoXtc5lhU2xBwp6Xj_KHj-8V37R7e4UBj';
+        const DEFAULT_GID = '1657054501';
+        // Updated header constant
+        const BIB_COLUMN_NAME = 'Bib #';
+
+        // State variables
+        let pubId = DEFAULT_PUB_ID;
+        let gid = DEFAULT_GID;
+
+        // Initialize from URL params
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+
+            const rawId = params.get('id') || params.get('pub');
+            if (rawId) {
+                const idMatch = rawId.match(/\/e\/([a-zA-Z0-9-_]+)/);
+                pubId = idMatch ? idMatch[1] : rawId;
+            }
+
+            gid = params.get('gid') || DEFAULT_GID;
+
+            document.getElementById('sourceInfo').innerText = `Published ID: ${pubId} | GID: ${gid}`;
+
+            document.getElementById('bibInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    fetchData();
+                }
+            });
+        }
+
+        /**
+         * CSV Parser adjusted for Row 2 Headers and Row 3 Data
+         */
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/);
+            if (lines.length < 2) return { headers: [], rows: [] };
+
+            const splitRow = (row) => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < row.length; i++) {
+                    const char = row[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result.map(v => v.replace(/^"|"$/g, ''));
+            };
+
+            const headers = splitRow(lines[1]);
+            const results = [];
+
+            for (let i = 2; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const values = splitRow(lines[i]);
+                const obj = {};
+                headers.forEach((header, index) => {
+                    if (header) {
+                        obj[header] = values[index] || '';
+                    }
+                });
+                results.push(obj);
+            }
+            return { headers, rows: results };
+        }
+
+        async function fetchData() {
+            const bibValue = document.getElementById('bibInput').value.trim();
+            if (!bibValue) {
+                showMessage('Please enter a bib number.', 'text-red-500');
+                return;
+            }
+
+            const resultsContainer = document.getElementById('resultsContainer');
+            const loading = document.getElementById('loading');
+            const emptyState = document.getElementById('emptyState');
+            const statusMessage = document.getElementById('statusMessage');
+
+            resultsContainer.innerHTML = '';
+            loading.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            statusMessage.classList.add('hidden');
+
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/e/${pubId}/pub?gid=${gid}&single=true&output=csv`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch CSV. Check if the ID and GID are correct.');
+
+                const csvText = await response.text();
+                const { headers, rows } = parseCSV(csvText);
+
+                if (!headers.includes(BIB_COLUMN_NAME)) {
+                    throw new Error(`Column "${BIB_COLUMN_NAME}" not found on row 2. Found headers: ${headers.filter(h => h).join(', ')}`);
+                }
+
+                const filteredResults = rows.filter(row => {
+                    const val = row[BIB_COLUMN_NAME];
+                    return val != null && val.toString().trim() === bibValue;
+                });
+
+                if (filteredResults.length === 0) {
+                    showMessage(`No records found for bib #${bibValue}.`, 'text-orange-500');
+                    emptyState.classList.remove('hidden');
+                } else {
+                    renderResults(filteredResults);
+                }
+
+            } catch (error) {
+                console.error(error);
+                showMessage(error.message || 'Error fetching data.', 'text-red-500');
+                emptyState.classList.remove('hidden');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function renderResults(results) {
+            const container = document.getElementById('resultsContainer');
+
+            results.forEach((row, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 data-card";
+
+                let contentHtml = `
+                    <div class="bg-blue-600 px-6 py-3 flex justify-between items-center">
+                        <h3 class="text-white font-bold text-lg">Entry #${index + 1}</h3>
+                        <span class="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded">Bib ${row[BIB_COLUMN_NAME]}</span>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                `;
+
+                Object.entries(row).forEach(([key, value]) => {
+                    if (key === BIB_COLUMN_NAME) return;
+                    if (!key) return;
+
+                    contentHtml += `
+                        <div class="border-b border-gray-50 pb-2">
+                            <span class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">${key}</span>
+                            <span class="text-gray-800 font-medium">${value || '—'}</span>
+                        </div>
+                    `;
+                });
+
+                contentHtml += `</div>`;
+                card.innerHTML = contentHtml;
+                container.appendChild(card);
+            });
+        }
+
+        function showMessage(text, colorClass) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.innerText = text;
+            statusMessage.className = `mt-4 text-sm font-medium ${colorClass}`;
+            statusMessage.classList.remove('hidden');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
