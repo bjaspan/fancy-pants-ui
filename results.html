@@ -49,9 +49,10 @@
             <h1 class="text-3xl font-extrabold text-blue-800 mb-2">Race Results</h1>
         </header>
 
-        <!-- Race Selector Section -->
+        <!-- Race Selector Section (Space-saving flat layout) -->
         <div class="mb-6 px-1">
             <div class="flex items-center gap-2 w-full">
+                <!-- Race Selector -->
                 <div class="flex-1 min-w-0">
                     <select
                         id="raceSelect"
@@ -62,6 +63,7 @@
                     </select>
                 </div>
 
+                <!-- Refresh Button -->
                 <button
                     onclick="refreshData()"
                     id="refreshBtn"
@@ -77,26 +79,48 @@
         <!-- Filter & Search Box -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-8 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Class Filter Group -->
                 <div class="w-full">
-                    <select
-                        id="classSelect"
-                        onchange="handleClassChange()"
-                        disabled
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                    >
-                        <option value="">All Classes</option>
-                    </select>
+                    <label for="classSelect" class="block text-xs font-bold text-gray-400 uppercase mb-1 px-1">Class</label>
+                    <div class="flex items-center gap-2">
+                        <select
+                            id="classSelect"
+                            onchange="handleClassChange()"
+                            disabled
+                            class="flex-grow px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                            <option value="">All Classes</option>
+                        </select>
+                        <button
+                            onclick="clearClassFilter()"
+                            title="Clear Class Filter"
+                            class="flex-shrink-0 p-3 text-gray-400 hover:text-red-500 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm active:bg-gray-50"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
                 </div>
 
+                <!-- Racer Filter Group -->
                 <div class="w-full">
-                    <select
-                        id="bibSelect"
-                        onchange="handleSelectionChange()"
-                        disabled
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                    >
-                        <option value="">Loading racers...</option>
-                    </select>
+                    <label for="bibSelect" class="block text-xs font-bold text-gray-400 uppercase mb-1 px-1">Racer</label>
+                    <div class="flex items-center gap-2">
+                        <select
+                            id="bibSelect"
+                            onchange="handleSelectionChange()"
+                            disabled
+                            class="flex-grow px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                            <option value="">Loading racers...</option>
+                        </select>
+                        <button
+                            onclick="clearRacerFilter()"
+                            title="Clear Racer Filter"
+                            class="flex-shrink-0 p-3 text-gray-400 hover:text-red-500 transition-colors bg-white border border-gray-300 rounded-lg shadow-sm active:bg-gray-50"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -181,19 +205,21 @@
         const COL_TIME = 'Raw Time';
         const COL_SCORE = 'Total Score';
 
-        // Exclusions and Mappings for tighter display
+        // Exclusions for dynamic columns
         const EXCLUDE_COLS = [
             'Indiv. Class Rank',
             'Individual Class Rank',
             'Total Touches',
             'Total Fifties',
             'Bib #',
-            'Class', // Handled via sub-heading grouping
+            'Name',
+            'Class',
             'Run',
             'Run #'
         ];
 
         const HEADER_MAP = {
+            'Bib #': 'Bib',
             'Name': 'Name',
             'Raw Time': 'Raw',
             'Total Score': 'Score',
@@ -306,7 +332,7 @@
             const btn = document.getElementById('refreshBtn');
             const icon = document.getElementById('refreshIcon');
             const currentClass = document.getElementById('classSelect').value;
-            const currentSelection = document.getElementById('bibSelect').value;
+            const currentName = document.getElementById('bibSelect').value;
 
             btn.disabled = true;
             icon.classList.add('refresh-spin');
@@ -318,9 +344,8 @@
                 handleClassChange();
             }
 
-            if (currentSelection) {
-                const select = document.getElementById('bibSelect');
-                select.value = currentSelection;
+            if (currentName) {
+                document.getElementById('bibSelect').value = currentName;
                 handleSelectionChange();
             }
 
@@ -375,6 +400,7 @@
 
         function populateClassSelect(rows) {
             const classSelect = document.getElementById('classSelect');
+            const previousValue = classSelect.value;
             const classes = [...new Set(rows.map(r => r[COL_CLASS]).filter(Boolean))].sort();
 
             classSelect.innerHTML = '<option value="">All Classes</option>';
@@ -384,11 +410,16 @@
                 option.textContent = cls;
                 classSelect.appendChild(option);
             });
+
+            if (classes.includes(previousValue)) {
+                classSelect.value = previousValue;
+            }
         }
 
         function handleClassChange() {
             const selectedClass = document.getElementById('classSelect').value;
             const bibSelect = document.getElementById('bibSelect');
+            const currentRacerName = bibSelect.value;
 
             const filteredRows = selectedClass
                 ? allData.filter(r => r[COL_CLASS] === selectedClass)
@@ -396,9 +427,13 @@
 
             populateRunnerSelect(filteredRows);
 
-            const stillExists = filteredRows.some(r => r[COL_BIB] === bibSelect.value);
-            if (!stillExists && bibSelect.value) {
-                bibSelect.value = "";
+            if (currentRacerName) {
+                const isStillInList = filteredRows.some(r => r[COL_NAME] === currentRacerName);
+                if (isStillInList) {
+                    bibSelect.value = currentRacerName;
+                } else {
+                    bibSelect.value = "";
+                }
             }
 
             updateDisplay();
@@ -414,49 +449,72 @@
             const selectedClass = document.getElementById('classSelect').value;
 
             select.innerHTML = selectedClass
-                ? `<option value="">-- All ${selectedClass} --</option>`
+                ? `<option value="">-- All racers in ${selectedClass} --</option>`
                 : '<option value="">-- All racers --</option>';
 
-            const uniqueBibs = new Map();
-            rows.forEach(row => {
-                const bib = row[COL_BIB];
-                if (!bib || uniqueBibs.has(bib)) return;
+            const uniqueNames = [...new Set(rows.map(r => r[COL_NAME]).filter(Boolean))].sort();
 
-                const fullName = row[COL_NAME] || 'Unknown';
-                const runnerClass = row[COL_CLASS] || 'N/A';
-                const label = `${bib} - ${fullName} - ${runnerClass}`;
-
+            uniqueNames.forEach(name => {
                 const option = document.createElement('option');
-                option.value = bib;
-                option.textContent = label;
+                option.value = name;
+                option.textContent = name;
                 select.appendChild(option);
-                uniqueBibs.set(bib, true);
             });
 
             if (previousValue) select.value = previousValue;
         }
 
         function handleSelectionChange() {
+            const nameValue = document.getElementById('bibSelect').value;
+            if (nameValue) {
+                const racerRows = allData.filter(r => r[COL_NAME] === nameValue);
+                populateClassSelect(racerRows);
+            } else {
+                populateClassSelect(allData);
+            }
             updateDisplay();
         }
 
+        /**
+         * Clears the class filter
+         */
+        function clearClassFilter() {
+            const select = document.getElementById('classSelect');
+            if (select.value !== "") {
+                select.value = "";
+                handleClassChange();
+            }
+        }
+
+        /**
+         * Clears the racer filter
+         */
+        function clearRacerFilter() {
+            const select = document.getElementById('bibSelect');
+            if (select.value !== "") {
+                select.value = "";
+                handleSelectionChange();
+            }
+        }
+
         function updateDisplay() {
-            const bibValue = document.getElementById('bibSelect').value;
+            const nameValue = document.getElementById('bibSelect').value;
             const classValue = document.getElementById('classSelect').value;
             const markerControls = document.getElementById('individualMarkerControls');
 
-            if (bibValue) {
+            if (nameValue) {
                 markerControls.classList.remove('hidden');
             } else {
                 markerControls.classList.add('hidden');
             }
 
-            // Determine table data
             let filteredResults = allData;
-            if (bibValue) {
-                filteredResults = allData.filter(row => row[COL_BIB] && row[COL_BIB].toString().trim() === bibValue);
+            if (classValue && nameValue) {
+                filteredResults = allData.filter(row => row[COL_CLASS] === classValue && row[COL_NAME] === nameValue);
             } else if (classValue) {
                 filteredResults = allData.filter(row => row[COL_CLASS] === classValue);
+            } else if (nameValue) {
+                filteredResults = allData.filter(row => row[COL_NAME] === nameValue);
             }
 
             updateCharts();
@@ -466,7 +524,7 @@
         function parseToNumeric(val) {
             if (!val) return null;
             if (typeof val === 'number') return val;
-            if (val.includes(':')) {
+            if (typeof val === 'string' && val.includes(':')) {
                 const parts = val.split(':').map(Number);
                 if (parts.length === 2) return (parts[0] * 60) + parts[1];
                 if (parts.length === 3) return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
@@ -479,7 +537,7 @@
             if (!allData || allData.length === 0) return;
 
             const selectedClass = document.getElementById('classSelect').value;
-            const bibValue = document.getElementById('bibSelect').value;
+            const nameValue = document.getElementById('bibSelect').value;
             const showTime = document.getElementById('showTime').checked;
             const showScore = document.getElementById('showScore').checked;
             const showRacerTime = document.getElementById('showRacerTime').checked;
@@ -516,23 +574,28 @@
             }
 
             const annotations = {};
-            if (bibValue) {
-                const bibData = allData.filter(row => row[COL_BIB] && row[COL_BIB].toString().trim() === bibValue);
-                bibData.forEach((run, idx) => {
+            if (nameValue) {
+                const racerRuns = selectedClass
+                    ? allData.filter(row => row[COL_NAME] === nameValue && row[COL_CLASS] === selectedClass)
+                    : allData.filter(row => row[COL_NAME] === nameValue);
+
+                racerRuns.forEach((run, idx) => {
                     const runTime = parseToNumeric(run[COL_TIME]);
                     const runScore = parseToNumeric(run[COL_SCORE]);
                     if (runTime !== null && showRacerTime) {
                         const runTimePos = (runTime - minVal) / BUCKET_SIZE;
                         annotations[`timeLine_${idx}`] = {
                             type: 'line', xMin: runTimePos, xMax: runTimePos,
-                            borderColor: 'rgba(30, 58, 138, 0.8)', borderWidth: 2, borderDash: [4, 4]
+                            borderColor: 'rgba(30, 58, 138, 0.8)', borderWidth: 2, borderDash: [4, 4],
+                            label: { display: false }
                         };
                     }
                     if (runScore !== null && showRacerScore) {
                         const runScorePos = (runScore - minVal) / BUCKET_SIZE;
                         annotations[`scoreLine_${idx}`] = {
                             type: 'line', xMin: runScorePos, xMax: runScorePos,
-                            borderColor: 'rgba(6, 78, 59, 0.8)', borderWidth: 2, borderDash: [6, 2]
+                            borderColor: 'rgba(6, 78, 59, 0.8)', borderWidth: 2, borderDash: [6, 2],
+                            label: { display: false }
                         };
                     }
                 });
@@ -572,11 +635,10 @@
         function renderResults(results) {
             const container = document.getElementById('resultsContainer');
             if (!results || results.length === 0) {
-                container.innerHTML = '';
+                container.innerHTML = '<div class="text-center p-10 bg-white rounded-xl shadow italic text-gray-400 border-2 border-dashed">No matching results to display.</div>';
                 return;
             }
 
-            // Grouping by class
             const groups = results.reduce((acc, row) => {
                 const cls = row[COL_CLASS] || 'Unclassified';
                 if (!acc[cls]) acc[cls] = [];
@@ -586,10 +648,9 @@
 
             const sortedClasses = Object.keys(groups).sort();
 
-            // Determine columns to show
             const allKeys = Object.keys(results[0]);
-            const visibleKeys = allKeys.filter(key => !EXCLUDE_COLS.includes(key));
-            const colCount = visibleKeys.length + 1; // +1 for Run #
+            const dynamicKeys = allKeys.filter(key => !EXCLUDE_COLS.includes(key));
+            const colCount = 3 + dynamicKeys.length;
 
             let tableHtml = `
                 <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
@@ -597,8 +658,10 @@
                         <table class="w-full text-sm text-left">
                             <thead class="bg-gray-50 text-gray-500 uppercase text-[10px] font-bold tracking-wider">
                                 <tr>
+                                    <th class="px-3 py-2 border-b border-gray-100">Bib</th>
+                                    <th class="px-3 py-2 border-b border-gray-100">Name</th>
                                     <th class="px-3 py-2 border-b border-gray-100">Run</th>
-                                    ${visibleKeys.map(key => `
+                                    ${dynamicKeys.map(key => `
                                         <th class="px-3 py-2 border-b border-gray-100 whitespace-nowrap">${HEADER_MAP[key] || key}</th>
                                     `).join('')}
                                 </tr>
@@ -607,22 +670,23 @@
             `;
 
             sortedClasses.forEach(cls => {
-                // Class Heading Row
                 tableHtml += `
                     <tr class="bg-gray-100">
                         <td colspan="${colCount}" class="px-3 py-1 text-[10px] font-black text-gray-500 uppercase tracking-widest border-y border-gray-200">${cls}</td>
                     </tr>
                 `;
 
-                groups[cls].forEach((row, index) => {
-                    // We need a logical run number. If filtering by bib, we use row order.
-                    // If showing many people, we look for a run index or default to #1
+                groups[cls].forEach((row) => {
                     const runNum = row['Run #'] || row['Run'] || '1';
+                    const bib = row['Bib #'] || '—';
+                    const name = row['Name'] || '—';
 
                     tableHtml += `
                         <tr class="hover:bg-blue-50 transition-colors">
+                            <td class="px-3 py-2 font-bold text-gray-900">${bib}</td>
+                            <td class="px-3 py-2 text-gray-700 font-semibold truncate max-w-[120px]">${name}</td>
                             <td class="px-3 py-2 font-bold text-blue-600">#${runNum}</td>
-                            ${visibleKeys.map(key => {
+                            ${dynamicKeys.map(key => {
                                 let val = row[key] || '—';
                                 if (key === 'Gates Touched' || key === 'Gates Fiftied') {
                                     val = val.toString().replace(/Gate\s*#/gi, '').trim() || '0';
