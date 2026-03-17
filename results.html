@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bib Number Lookup</title>
+    <title>Race Results</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Plugin for drawing vertical lines (annotations) -->
@@ -21,12 +21,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .data-card {
-            transition: transform 0.2s;
-        }
-        .data-card:hover {
-            transform: translateY(-2px);
-        }
         select {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -37,6 +31,14 @@
         .refresh-spin {
             animation: spin 1s linear infinite;
         }
+        /* Custom scrollbar for tight tables */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 4px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans text-gray-900">
@@ -44,13 +46,12 @@
     <div class="max-w-4xl mx-auto px-4 py-8">
         <!-- Header -->
         <header class="text-center mb-6">
-            <h1 class="text-3xl font-extrabold text-blue-800 mb-2">Race Results Lookup</h1>
+            <h1 class="text-3xl font-extrabold text-blue-800 mb-2">Race Results</h1>
         </header>
 
-        <!-- Race Selector Section (Space-saving flat layout) -->
+        <!-- Race Selector Section -->
         <div class="mb-6 px-1">
             <div class="flex items-center gap-2 w-full">
-                <!-- Race Selector -->
                 <div class="flex-1 min-w-0">
                     <select
                         id="raceSelect"
@@ -61,7 +62,6 @@
                     </select>
                 </div>
 
-                <!-- Refresh Button -->
                 <button
                     onclick="refreshData()"
                     id="refreshBtn"
@@ -77,7 +77,6 @@
         <!-- Filter & Search Box -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-8 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Class Selector -->
                 <div class="w-full">
                     <select
                         id="classSelect"
@@ -89,7 +88,6 @@
                     </select>
                 </div>
 
-                <!-- Racer Selector -->
                 <div class="w-full">
                     <select
                         id="bibSelect"
@@ -116,7 +114,6 @@
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <h3 class="text-lg font-bold text-gray-800" id="distributionTitle">Overall Distribution Overview</h3>
 
-                        <!-- Control Checkboxes (Group) -->
                         <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-medium">
                             <label class="flex items-center gap-2 cursor-pointer select-none">
                                 <input type="checkbox" id="showTime" checked onchange="updateCharts()" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
@@ -129,7 +126,6 @@
                         </div>
                     </div>
 
-                    <!-- Individual Marker Checkboxes -->
                     <div id="individualMarkerControls" class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-bold border-t border-gray-100 pt-3 hidden">
                         <span class="text-gray-400 uppercase tracking-wider">Racer Markers:</span>
                         <label class="flex items-center gap-2 cursor-pointer select-none">
@@ -143,15 +139,15 @@
                     </div>
                 </div>
 
-                <div class="h-80 w-full">
+                <div class="h-64 w-full">
                     <canvas id="statsChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Results Section (Visible when runner selected) -->
-        <div id="resultsContainer" class="space-y-6 hidden">
-            <!-- Cards will be injected here -->
+        <!-- Results Section (Always Visible below graph) -->
+        <div id="resultsContainer" class="mb-8">
+            <!-- Table will be injected here -->
         </div>
 
         <!-- Empty State -->
@@ -164,7 +160,6 @@
         </div>
     </div>
 
-    <!-- Footer / Debug Info -->
     <footer class="text-center text-xs text-gray-400 pb-8 mt-auto px-4">
         <p id="sourceInfo" class="truncate">Source: ...</p>
     </footer>
@@ -185,7 +180,28 @@
         const COL_CLASS = 'Class';
         const COL_TIME = 'Raw Time';
         const COL_SCORE = 'Total Score';
-        const EXCLUDE_COL = 'Indiv. Class Rank';
+
+        // Exclusions and Mappings for tighter display
+        const EXCLUDE_COLS = [
+            'Indiv. Class Rank',
+            'Individual Class Rank',
+            'Total Touches',
+            'Total Fifties',
+            'Bib #',
+            'Class', // Handled via sub-heading grouping
+            'Run',
+            'Run #'
+        ];
+
+        const HEADER_MAP = {
+            'Name': 'Name',
+            'Raw Time': 'Raw',
+            'Total Score': 'Score',
+            'Class Rank': 'Rank',
+            'Gates Touched': 'Touch',
+            'Gates Fiftied': 'Fifty',
+            'Total Penalties': 'Penalties'
+        };
 
         const BUCKET_SIZE = 5;
         const MIN_TIME_SAMPLE = 10;
@@ -210,7 +226,6 @@
                 const data = await response.json();
                 currentRaces = data.races;
             } catch (e) {
-                console.log("Using fallback races JSON");
                 currentRaces = FALLBACK_RACES.races;
             }
 
@@ -318,13 +333,11 @@
             const classSelect = document.getElementById('classSelect');
             const loading = document.getElementById('loading');
             const emptyState = document.getElementById('emptyState');
-            const resultsContainer = document.getElementById('resultsContainer');
 
             bibSelect.disabled = true;
             classSelect.disabled = true;
             loading.classList.remove('hidden');
             emptyState.classList.add('hidden');
-            resultsContainer.classList.add('hidden');
 
             try {
                 const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}&t=${new Date().getTime()}`;
@@ -338,11 +351,8 @@
                     throw new Error(`Critical column "${COL_BIB}" not found.`);
                 }
 
-                // Apply global filtering for time range: exclude < 10 or > 900
                 allData = rows.filter(row => {
                     const time = parseToNumeric(row[COL_TIME]);
-                    // If no time sample exists, we keep the row (DNS/DNF/etc),
-                    // but if it exists, it must be within the 10-900 range.
                     return time === null || (time >= MIN_TIME_SAMPLE && time <= MAX_TIME_SAMPLE);
                 });
 
@@ -351,7 +361,7 @@
                 populateRunnerSelect(allData);
                 bibSelect.disabled = false;
 
-                updateCharts();
+                updateDisplay();
 
             } catch (error) {
                 console.error(error);
@@ -391,7 +401,7 @@
                 bibSelect.value = "";
             }
 
-            handleSelectionChange();
+            updateDisplay();
 
             document.getElementById('distributionTitle').textContent = selectedClass
                 ? `Distribution: ${selectedClass}`
@@ -404,8 +414,8 @@
             const selectedClass = document.getElementById('classSelect').value;
 
             select.innerHTML = selectedClass
-                ? `<option value="">All ${selectedClass}</option>`
-                : '<option value="">All racers</option>';
+                ? `<option value="">-- All ${selectedClass} --</option>`
+                : '<option value="">-- All racers --</option>';
 
             const uniqueBibs = new Map();
             rows.forEach(row => {
@@ -427,33 +437,30 @@
         }
 
         function handleSelectionChange() {
+            updateDisplay();
+        }
+
+        function updateDisplay() {
             const bibValue = document.getElementById('bibSelect').value;
-            const resultsContainer = document.getElementById('resultsContainer');
+            const classValue = document.getElementById('classSelect').value;
             const markerControls = document.getElementById('individualMarkerControls');
 
-            if (!bibValue) {
-                resultsContainer.classList.add('hidden');
+            if (bibValue) {
+                markerControls.classList.remove('hidden');
+            } else {
                 markerControls.classList.add('hidden');
-                updateCharts();
-                return;
             }
 
-            markerControls.classList.remove('hidden');
-            resultsContainer.classList.remove('hidden');
-            resultsContainer.innerHTML = '';
-
-            const filteredResults = allData.filter(row => {
-                const val = row[COL_BIB];
-                return val != null && val.toString().trim() === bibValue;
-            });
-
-            if (filteredResults.length === 0) {
-                resultsContainer.innerHTML = '<div class="text-center p-10 bg-white rounded-xl shadow italic text-gray-400">No results found for this selection.</div>';
-            } else {
-                renderResults(filteredResults);
+            // Determine table data
+            let filteredResults = allData;
+            if (bibValue) {
+                filteredResults = allData.filter(row => row[COL_BIB] && row[COL_BIB].toString().trim() === bibValue);
+            } else if (classValue) {
+                filteredResults = allData.filter(row => row[COL_CLASS] === classValue);
             }
 
             updateCharts();
+            renderResults(filteredResults);
         }
 
         function parseToNumeric(val) {
@@ -491,10 +498,8 @@
                 return;
             }
 
-            // Calculate min and max based on data
             const actualMin = Math.min(...allValues);
             const actualMax = Math.max(...allValues);
-
             const minVal = Math.floor(actualMin / BUCKET_SIZE) * BUCKET_SIZE;
             const maxVal = Math.ceil(actualMax / BUCKET_SIZE) * BUCKET_SIZE;
 
@@ -510,40 +515,24 @@
                 scoreCounts.push(sCount);
             }
 
-            // Annotation calculations for selected bib
             const annotations = {};
             if (bibValue) {
                 const bibData = allData.filter(row => row[COL_BIB] && row[COL_BIB].toString().trim() === bibValue);
-
                 bibData.forEach((run, idx) => {
                     const runTime = parseToNumeric(run[COL_TIME]);
                     const runScore = parseToNumeric(run[COL_SCORE]);
-
                     if (runTime !== null && showRacerTime) {
-                        // Position annotation relative to dynamic minVal
                         const runTimePos = (runTime - minVal) / BUCKET_SIZE;
                         annotations[`timeLine_${idx}`] = {
-                            type: 'line',
-                            xMin: runTimePos,
-                            xMax: runTimePos,
-                            borderColor: 'rgba(30, 58, 138, 0.8)',
-                            borderWidth: 2,
-                            borderDash: [4, 4],
-                            label: { display: false }
+                            type: 'line', xMin: runTimePos, xMax: runTimePos,
+                            borderColor: 'rgba(30, 58, 138, 0.8)', borderWidth: 2, borderDash: [4, 4]
                         };
                     }
-
                     if (runScore !== null && showRacerScore) {
-                        // Position annotation relative to dynamic minVal
                         const runScorePos = (runScore - minVal) / BUCKET_SIZE;
                         annotations[`scoreLine_${idx}`] = {
-                            type: 'line',
-                            xMin: runScorePos,
-                            xMax: runScorePos,
-                            borderColor: 'rgba(6, 78, 59, 0.8)',
-                            borderWidth: 2,
-                            borderDash: [6, 2],
-                            label: { display: false }
+                            type: 'line', xMin: runScorePos, xMax: runScorePos,
+                            borderColor: 'rgba(6, 78, 59, 0.8)', borderWidth: 2, borderDash: [6, 2]
                         };
                     }
                 });
@@ -551,60 +540,30 @@
 
             const canvas = document.getElementById('statsChart');
             const ctx = canvas.getContext('2d');
-
             if (statsChart) statsChart.destroy();
-
-            const datasets = [];
-            if (showTime) {
-                datasets.push({
-                    label: `Raw Time (${selectedClass || 'Overall'})`,
-                    data: timeCounts,
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 3,
-                    tension: 0.3,
-                    fill: true,
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgb(59, 130, 246)'
-                });
-            }
-            if (showScore) {
-                datasets.push({
-                    label: `Total Score (${selectedClass || 'Overall'})`,
-                    data: scoreCounts,
-                    borderColor: 'rgb(16, 185, 129)',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 3,
-                    tension: 0.3,
-                    fill: true,
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgb(16, 185, 129)'
-                });
-            }
 
             statsChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: datasets
+                    datasets: [
+                        ...(showTime ? [{
+                            label: `Raw Time`, data: timeCounts, borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 3, tension: 0.3, fill: true, pointRadius: 2
+                        }] : []),
+                        ...(showScore ? [{
+                            label: `Total Score`, data: scoreCounts, borderColor: 'rgb(16, 185, 129)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 3, tension: 0.3, fill: true, pointRadius: 2
+                        }] : [])
+                    ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     interaction: { intersect: false, mode: 'index' },
-                    plugins: {
-                        legend: { display: false },
-                        annotation: { annotations: annotations },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            titleFont: { size: 14, weight: 'bold' },
-                            bodyFont: { size: 13 }
-                        }
-                    },
+                    plugins: { legend: { display: false }, annotation: { annotations: annotations } },
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Count' }, ticks: { precision: 0 } },
-                        x: { title: { display: true, text: 'Seconds (5-second intervals)' }, grid: { display: false } }
+                        y: { beginAtZero: true, title: { display: true, text: 'Count', font: { size: 10 } } },
+                        x: { title: { display: true, text: 'Seconds', font: { size: 10 } }, grid: { display: false } }
                     }
                 }
             });
@@ -612,34 +571,77 @@
 
         function renderResults(results) {
             const container = document.getElementById('resultsContainer');
-            results.forEach((row, index) => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 data-card";
+            if (!results || results.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
 
-                let contentHtml = `
-                    <div class="bg-blue-600 px-6 py-3 flex justify-between items-center">
-                        <h3 class="text-white font-bold text-lg">Record #${index + 1}</h3>
-                        <span class="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded">Bib ${row[COL_BIB]}</span>
-                    </div>
-                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            // Grouping by class
+            const groups = results.reduce((acc, row) => {
+                const cls = row[COL_CLASS] || 'Unclassified';
+                if (!acc[cls]) acc[cls] = [];
+                acc[cls].push(row);
+                return acc;
+            }, {});
+
+            const sortedClasses = Object.keys(groups).sort();
+
+            // Determine columns to show
+            const allKeys = Object.keys(results[0]);
+            const visibleKeys = allKeys.filter(key => !EXCLUDE_COLS.includes(key));
+            const colCount = visibleKeys.length + 1; // +1 for Run #
+
+            let tableHtml = `
+                <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-500 uppercase text-[10px] font-bold tracking-wider">
+                                <tr>
+                                    <th class="px-3 py-2 border-b border-gray-100">Run</th>
+                                    ${visibleKeys.map(key => `
+                                        <th class="px-3 py-2 border-b border-gray-100 whitespace-nowrap">${HEADER_MAP[key] || key}</th>
+                                    `).join('')}
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+            `;
+
+            sortedClasses.forEach(cls => {
+                // Class Heading Row
+                tableHtml += `
+                    <tr class="bg-gray-100">
+                        <td colspan="${colCount}" class="px-3 py-1 text-[10px] font-black text-gray-500 uppercase tracking-widest border-y border-gray-200">${cls}</td>
+                    </tr>
                 `;
 
-                Object.entries(row).forEach(([key, value]) => {
-                    // Skip bib (already in header) and specific excluded columns
-                    if (!key || key === EXCLUDE_COL) return;
+                groups[cls].forEach((row, index) => {
+                    // We need a logical run number. If filtering by bib, we use row order.
+                    // If showing many people, we look for a run index or default to #1
+                    const runNum = row['Run #'] || row['Run'] || '1';
 
-                    contentHtml += `
-                        <div class="border-b border-gray-50 pb-2">
-                            <span class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">${key}</span>
-                            <span class="text-gray-800 font-medium">${value || '—'}</span>
-                        </div>
+                    tableHtml += `
+                        <tr class="hover:bg-blue-50 transition-colors">
+                            <td class="px-3 py-2 font-bold text-blue-600">#${runNum}</td>
+                            ${visibleKeys.map(key => {
+                                let val = row[key] || '—';
+                                if (key === 'Gates Touched' || key === 'Gates Fiftied') {
+                                    val = val.toString().replace(/Gate\s*#/gi, '').trim() || '0';
+                                }
+                                return `<td class="px-3 py-2 text-gray-700 font-medium whitespace-nowrap">${val}</td>`;
+                            }).join('')}
+                        </tr>
                     `;
                 });
-
-                contentHtml += `</div>`;
-                card.innerHTML = contentHtml;
-                container.appendChild(card);
             });
+
+            tableHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = tableHtml;
         }
 
         function showMessage(text, colorClass) {
