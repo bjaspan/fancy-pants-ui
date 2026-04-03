@@ -1,10 +1,16 @@
-# The Docker image that will be used to build your app
-image: node:lts
-create-pages:
-  pages:
-    # The folder that contains the files to be exposed at the Page URL
-    publish: /
+pages:
+  image: alpine:latest
+  stage: deploy
+  script:
+    # 1. Create a temporary directory to avoid infinite recursion
+    - mkdir .temp_public
+    # 2. Copy everything from root into the temporary directory
+    # (Exclude the .git folder and the temporary folder itself)
+    - cp -rp * .temp_public/ 2>/dev/null || true
+    # 3. Rename it to 'public' (GitLab's mandatory folder name)
+    - mv .temp_public public
+  artifacts:
+    paths:
+      - public
   rules:
-    # This ensures that only pushes to the default branch will trigger
-    # a pages deploy
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
