@@ -72,6 +72,8 @@
 
                     <!-- Hidden field to submit the Station name to Google Forms -->
                     <input type="hidden" id="station-hidden-input" name="entry.75359853" value="">
+                    <!-- Hidden field to submit the 'v' query parameter -->
+                    <input type="hidden" id="v-hidden-input" name="entry.1893223136" value="">
                 </div>
 
                 <!-- Bib Number (Hidden by default) -->
@@ -632,6 +634,13 @@
             const confirmationSummary = document.getElementById('confirmation-summary');
             const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
             const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+
+            // Read 'v' from URL parameters and set it in the hidden input
+            const urlParams = new URLSearchParams(window.location.search);
+            const vParam = urlParams.get('v');
+            if (vParam) {
+                document.getElementById('v-hidden-input').value = vParam;
+            }
 
             // This is the Google Form's actual submission URL.
             const SUBMISSION_URL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8BGyWb91SaPUdOfizgt0bZvLgCLwBp2P4gPCOHiruyRaOUw/formResponse';
