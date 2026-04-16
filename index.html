@@ -986,12 +986,6 @@
                         body: formData
                     });
 
-                    // Note: In 'no-cors' mode, response.ok is always false and status is 0.
-                    // If you ever use a proxy or CORS is enabled in the future, this will catch the server's validation rejection natively.
-                    if (response.type !== 'opaque' && !response.ok) {
-                        throw new Error('Validation failed.');
-                    }
-
                     // 'no-cors' mode means we can't reliably read the response,
                     // so we assume success if the request didn't throw a network error/rejection.
                     statusMessage.textContent = 'Success! Entry recorded.';
@@ -1007,8 +1001,7 @@
 
                 } catch (error) {
                     console.error('Error submitting form:', error);
-                    // Update to show "Validation failed." when the submission is rejected/fails.
-                    statusMessage.textContent = 'Validation failed.';
+                    statusMessage.textContent = 'Network error during submission.';
                     statusMessage.className = 'block text-center text-sm font-medium p-3 rounded-lg bg-red-600 text-white';
                 } finally {
                     statusMessage.classList.remove('hidden');
