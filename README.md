@@ -1,6 +1,10 @@
-This repo contains web apps for the Fancy Pants whitewater gate
-judging and scoring system used by the [New England Slalom
-Series](https://www.nessrace.com/).
+This repo contains web apps for the Fancy Pants used by the
+[New England Slalom Series](https://www.nessrace.com/). There are currently three apps:
+
+* Scoring, for recording gate judging results and raw time for each bib number.
+* Results viewing, for viewing race results in real time.
+* Session optimizer, for assigning classes to sessions with the fewest
+  racers in both session.
 
 # Scoring app
 
