@@ -1,10 +1,10 @@
 {
-  "race_name": "Sample Slalom",
+  "race_name": "Kenduskeag TEST",
   "stations": [
-    { "name": "Start", "max_gate": 2 },
-    { "name": "Station A", "max_gate": 6 },
+    { "name": "Start", "max_gate": 1 },
+    { "name": "Station A", "max_gate": 5 },
     { "name": "Station B", "max_gate": 12 },
-    { "name": "Station C", "max_gate": 18 },
+    { "name": "Station C", "max_gate": 17 },
     { "name": "Station D", "max_gate": 25 },
     { "name": "Finish", "is_finish": true }
   ]
