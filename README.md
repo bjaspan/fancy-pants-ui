@@ -3,8 +3,8 @@ This repo contains web apps for the Fancy Pants used by the
 
 * Scoring, for recording gate judging results and raw time for each bib number.
 * Results viewing, for viewing race results in real time.
-* Session optimizer, for assigning classes to sessions with the fewest
-  racers in both session.
+* Session optimizer (in development!), for assigning classes to
+  sessions with the fewest racers in both session.
 
 # Scoring app
 
