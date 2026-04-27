@@ -72,6 +72,8 @@
 
                     <!-- Hidden field to submit the Station name to Google Forms -->
                     <input type="hidden" id="station-hidden-input" name="entry.75359853" value="">
+                    <!-- Hidden field to submit the 'v' query parameter -->
+                    <input type="hidden" id="v-hidden-input" name="entry.1893223136" value="">
                 </div>
 
                 <!-- Bib Number (Hidden by default) -->
@@ -633,6 +635,13 @@
             const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
             const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
 
+            // Read 'v' from URL parameters and set it in the hidden input
+            const urlParams = new URLSearchParams(window.location.search);
+            const vParam = urlParams.get('v');
+            if (vParam) {
+                document.getElementById('v-hidden-input').value = vParam;
+            }
+
             // This is the Google Form's actual submission URL.
             const SUBMISSION_URL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8BGyWb91SaPUdOfizgt0bZvLgCLwBp2P4gPCOHiruyRaOUw/formResponse';
 
@@ -977,8 +986,8 @@
                         body: formData
                     });
 
-                    // 'no-cors' mode means we can't read the response,
-                    // so we just assume success if the request didn't throw.
+                    // 'no-cors' mode means we can't reliably read the response,
+                    // so we assume success if the request didn't throw a network error/rejection.
                     statusMessage.textContent = 'Success! Entry recorded.';
                     statusMessage.className = 'block text-center text-sm font-medium p-3 rounded-lg bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
 
@@ -992,7 +1001,7 @@
 
                 } catch (error) {
                     console.error('Error submitting form:', error);
-                    statusMessage.textContent = 'Error: Could not submit. Check connection.';
+                    statusMessage.textContent = 'Network error during submission.';
                     statusMessage.className = 'block text-center text-sm font-medium p-3 rounded-lg bg-red-600 text-white';
                 } finally {
                     statusMessage.classList.remove('hidden');
